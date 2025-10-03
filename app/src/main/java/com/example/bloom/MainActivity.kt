@@ -3,18 +3,22 @@ package com.example.bloom
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import com.example.bloom.data.model.Frequency
-import com.example.bloom.data.model.Habit
 import com.example.bloom.ui.screens.habitlist.HabitListScreen
 import com.example.bloom.ui.screens.splash.SplashScreen
 import com.example.bloom.ui.theme.BloomTheme
+import com.example.bloom.viewmodel.HabitViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val habitViewModel: HabitViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -23,7 +27,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppEntry()
+                    AppEntry(habitViewModel)
                 }
             }
         }
@@ -31,30 +35,18 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppEntry() {
-    var showSplash by remember { mutableStateOf(true) }
+fun AppEntry(viewModel: HabitViewModel) {
+    var showSplash by rememberSaveable { mutableStateOf(true) }
 
     if (showSplash) {
         SplashScreen {
             showSplash = false
         }
     } else {
-        // ✅ Show Habit List after splash
-        val sampleHabits = remember {
-            mutableStateListOf(
-                Habit(1, "Drink Water", "8 glasses a day", Frequency.DAILY),
-                Habit(2, "Morning Walk", "30 minutes", Frequency.DAILY),
-                Habit(3, "Read a Book", "At least 10 pages", Frequency.WEEKLY)
-            )
-        }
-
         HabitListScreen(
-            habits = sampleHabits,
+            habits = viewModel.habits,
             onHabitCheckedChange = { habit, isChecked ->
-                val index = sampleHabits.indexOf(habit)
-                if (index != -1) {
-                    sampleHabits[index] = habit.copy(isCompleted = isChecked)
-                }
+                viewModel.toggleHabitCompletion(habit, isChecked)
             }
         )
     }
