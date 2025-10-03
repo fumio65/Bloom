@@ -7,8 +7,11 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.bloom.ui.screens.habitlist.HabitListScreen
 import com.example.bloom.ui.screens.splash.SplashScreen
@@ -36,6 +39,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppEntry(viewModel: HabitViewModel) {
+    // <-- rememberSaveable import used here
     var showSplash by rememberSaveable { mutableStateOf(true) }
 
     if (showSplash) {
