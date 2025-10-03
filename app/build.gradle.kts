@@ -57,10 +57,18 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.0")
 
-    // Compose
+    // Jetpack Compose
     implementation("androidx.compose.ui:ui:1.5.1")
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.1")
     implementation("androidx.compose.material3:material3:1.1.2")
+
+    // ✅ ViewModel + LiveData + State management
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
+    // ✅ Accompanist (animations, system UI controller, etc.)
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.32.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
