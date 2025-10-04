@@ -35,4 +35,12 @@ class HabitViewModel : ViewModel() {
     fun deleteHabit(habit: Habit) {
         _habits.remove(habit)
     }
+
+    fun updateHabit(updatedHabit: Habit) {
+        val index = _habits.indexOfFirst { it.id == updatedHabit.id }
+        if (index != -1) {
+            _habits[index] = updatedHabit
+        }
+    }
+
 }
