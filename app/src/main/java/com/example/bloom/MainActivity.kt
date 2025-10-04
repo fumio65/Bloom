@@ -5,14 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.bloom.ui.screens.addhabit.AddHabitScreen
 import com.example.bloom.ui.screens.habitlist.HabitListScreen
 import com.example.bloom.ui.screens.splash.SplashScreen
 import com.example.bloom.ui.theme.BloomTheme
@@ -39,19 +36,39 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppEntry(viewModel: HabitViewModel) {
-    // <-- rememberSaveable import used here
     var showSplash by rememberSaveable { mutableStateOf(true) }
+    var showAddHabit by rememberSaveable { mutableStateOf(false) }
 
     if (showSplash) {
         SplashScreen {
             showSplash = false
         }
     } else {
-        HabitListScreen(
-            habits = viewModel.habits,
-            onHabitCheckedChange = { habit, isChecked ->
-                viewModel.toggleHabitCompletion(habit, isChecked)
+        if (showAddHabit) {
+            // ✅ Show AddHabitScreen
+            AddHabitScreen(
+                onHabitAdded = { newHabit ->
+                    viewModel.addHabit(newHabit)
+                    showAddHabit = false
+                },
+                onCancel = { showAddHabit = false }
+            )
+        } else {
+            // ✅ Show Habit List
+            Scaffold(
+                floatingActionButton = {
+                    FloatingActionButton(onClick = { showAddHabit = true }) {
+                        Text("+")
+                    }
+                }
+            ) { paddingValues ->
+                HabitListScreen(
+                    habits = viewModel.habits,
+                    onHabitCheckedChange = { habit, isChecked ->
+                        viewModel.toggleHabitCompletion(habit, isChecked)
+                    }
+                )
             }
-        )
+        }
     }
 }

@@ -47,9 +47,7 @@ fun AddHabitScreen(
 
         Text("Frequency", style = MaterialTheme.typography.titleMedium)
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             RadioButton(
                 selected = frequency == Frequency.DAILY,
                 onClick = { frequency = Frequency.DAILY }
@@ -65,14 +63,12 @@ fun AddHabitScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Button(
                 onClick = {
                     if (title.isNotBlank()) {
                         val newHabit = Habit(
-                            id = (0..100000).random(), // temporary ID generator
+                            id = (0..100000).random(), // temporary ID
                             title = title,
                             description = description.ifBlank { null },
                             frequency = frequency
