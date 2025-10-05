@@ -5,11 +5,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.bloom.data.model.Habit
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.bloom.navigation.NavRoutes
 import com.example.bloom.ui.screens.addhabit.AddHabitScreen
 import com.example.bloom.ui.screens.edithabit.EditHabitScreen
 import com.example.bloom.ui.screens.habitlist.HabitListScreen
@@ -18,7 +23,6 @@ import com.example.bloom.ui.theme.BloomTheme
 import com.example.bloom.viewmodel.HabitViewModel
 
 class MainActivity : ComponentActivity() {
-
     private val habitViewModel: HabitViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppEntry(habitViewModel)
+                    BloomNavHost(viewModel = habitViewModel)
                 }
             }
         }
@@ -37,56 +41,77 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppEntry(viewModel: HabitViewModel) {
-    var showSplash by rememberSaveable { mutableStateOf(true) }
-    var showAddHabit by rememberSaveable { mutableStateOf(false) }
-    var habitToEdit by rememberSaveable { mutableStateOf<Habit?>(null) }
+fun BloomNavHost(viewModel: HabitViewModel) {
+    val navController = rememberNavController()
 
-    if (showSplash) {
-        SplashScreen { showSplash = false }
-    } else {
-        when {
-            showAddHabit -> {
-                // ✅ Add Habit flow
-                AddHabitScreen(
-                    onHabitAdded = { newHabit ->
-                        viewModel.addHabit(newHabit)
-                        showAddHabit = false
+    NavHost(
+        navController = navController,
+        startDestination = NavRoutes.Splash.route
+    ) {
+        // 🪴 Splash Screen
+        composable(NavRoutes.Splash.route) {
+            SplashScreen {
+                navController.navigate(NavRoutes.HabitList.route) {
+                    popUpTo(NavRoutes.Splash.route) { inclusive = true }
+                }
+            }
+        }
+
+        // 📋 Habit List Screen
+        composable(NavRoutes.HabitList.route) {
+            Scaffold(
+                floatingActionButton = {
+                    FloatingActionButton(onClick = {
+                        navController.navigate(NavRoutes.AddHabit.route)
+                    }) {
+                        Text("+")
+                    }
+                }
+            ) { paddingValues ->
+                HabitListScreen(
+                    habits = viewModel.habits,
+                    onHabitCheckedChange = { habit, isChecked ->
+                        viewModel.toggleHabitCompletion(habit, isChecked)
                     },
-                    onCancel = { showAddHabit = false }
+                    onHabitClick = { habit ->
+                        navController.navigate(NavRoutes.EditHabit.createRoute(habit.id))
+                    },
+                    onHabitDelete = { habit ->
+                        viewModel.deleteHabit(habit)
+                    },
+                    modifier = Modifier.padding(paddingValues) // ✅ apply scaffold padding
                 )
             }
+        }
 
-            habitToEdit != null -> {
-                // ✅ Edit Habit flow
+        // ➕ Add Habit Screen
+        composable(NavRoutes.AddHabit.route) {
+            AddHabitScreen(
+                onHabitAdded = { newHabit ->
+                    viewModel.addHabit(newHabit)
+                    navController.popBackStack()
+                },
+                onCancel = { navController.popBackStack() }
+            )
+        }
+
+        // ✏️ Edit Habit Screen
+        composable(
+            route = NavRoutes.EditHabit.route,
+            arguments = listOf(navArgument("habitId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val habitId = backStackEntry.arguments?.getInt("habitId")
+            val habit = viewModel.habits.find { it.id == habitId }
+
+            habit?.let {
                 EditHabitScreen(
-                    habit = habitToEdit!!,
+                    habit = it,
                     onHabitUpdated = { updatedHabit ->
                         viewModel.updateHabit(updatedHabit)
-                        habitToEdit = null
+                        navController.popBackStack()
                     },
-                    onCancel = { habitToEdit = null }
+                    onCancel = { navController.popBackStack() }
                 )
-            }
-
-            else -> {
-                // ✅ Default Habit List with FAB
-                Scaffold(
-                    floatingActionButton = {
-                        FloatingActionButton(onClick = { showAddHabit = true }) {
-                            Text("+")
-                        }
-                    }
-                ) { paddingValues ->
-                    HabitListScreen(
-                        habits = viewModel.habits,
-                        onHabitCheckedChange = { habit, isChecked ->
-                            viewModel.toggleHabitCompletion(habit, isChecked)
-                        },
-                        onHabitClick = { habit -> habitToEdit = habit },
-                        onHabitDelete = { habit -> viewModel.deleteHabit(habit) } // ✅ delete habit
-                    )
-                }
             }
         }
     }
