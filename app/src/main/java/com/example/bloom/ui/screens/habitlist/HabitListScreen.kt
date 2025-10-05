@@ -17,7 +17,8 @@ fun HabitListScreen(
     habits: List<Habit>,
     onHabitCheckedChange: (Habit, Boolean) -> Unit,
     onHabitClick: (Habit) -> Unit,
-    onHabitDelete: (Habit) -> Unit // ✅ new callback
+    onHabitDelete: (Habit) -> Unit, // ✅ new callback
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = Modifier
