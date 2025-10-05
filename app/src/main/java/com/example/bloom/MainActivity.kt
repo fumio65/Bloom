@@ -83,7 +83,8 @@ fun AppEntry(viewModel: HabitViewModel) {
                         onHabitCheckedChange = { habit, isChecked ->
                             viewModel.toggleHabitCompletion(habit, isChecked)
                         },
-                        onHabitClick = { habit -> habitToEdit = habit } // ✅ opens edit screen
+                        onHabitClick = { habit -> habitToEdit = habit },
+                        onHabitDelete = { habit -> viewModel.deleteHabit(habit) } // ✅ delete habit
                     )
                 }
             }
