@@ -28,6 +28,9 @@ sealed class BottomNavRoutes(
     )
 
     companion object {
-        val items = listOf(Habits, Profile, Settings)
+        // ✅ Use a non-null immutable list
+        val items: List<BottomNavRoutes> by lazy {
+            listOf(Habits, Profile, Settings)
+        }
     }
 }
