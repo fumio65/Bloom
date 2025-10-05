@@ -47,6 +47,7 @@ fun AppEntry(viewModel: HabitViewModel) {
     } else {
         when {
             showAddHabit -> {
+                // ✅ Add Habit flow
                 AddHabitScreen(
                     onHabitAdded = { newHabit ->
                         viewModel.addHabit(newHabit)
@@ -57,6 +58,7 @@ fun AppEntry(viewModel: HabitViewModel) {
             }
 
             habitToEdit != null -> {
+                // ✅ Edit Habit flow
                 EditHabitScreen(
                     habit = habitToEdit!!,
                     onHabitUpdated = { updatedHabit ->
@@ -68,6 +70,7 @@ fun AppEntry(viewModel: HabitViewModel) {
             }
 
             else -> {
+                // ✅ Default Habit List with FAB
                 Scaffold(
                     floatingActionButton = {
                         FloatingActionButton(onClick = { showAddHabit = true }) {
@@ -79,9 +82,8 @@ fun AppEntry(viewModel: HabitViewModel) {
                         habits = viewModel.habits,
                         onHabitCheckedChange = { habit, isChecked ->
                             viewModel.toggleHabitCompletion(habit, isChecked)
-                        }
-                        // ⬇️ Add click handling when HabitListScreen supports it
-                        // onHabitClick = { habit -> habitToEdit = habit }
+                        },
+                        onHabitClick = { habit -> habitToEdit = habit } // ✅ opens edit screen
                     )
                 }
             }
