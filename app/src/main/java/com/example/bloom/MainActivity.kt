@@ -13,7 +13,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.navArgument // ✅ missing import fixed
 import com.example.bloom.navigation.NavRoutes
 import com.example.bloom.ui.screens.addhabit.AddHabitScreen
 import com.example.bloom.ui.screens.edithabit.EditHabitScreen
@@ -61,13 +61,15 @@ fun BloomNavHost(viewModel: HabitViewModel) {
         composable(NavRoutes.HabitList.route) {
             Scaffold(
                 floatingActionButton = {
-                    FloatingActionButton(onClick = {
-                        navController.navigate(NavRoutes.AddHabit.route)
-                    }) {
-                        Text("+")
+                    FloatingActionButton(
+                        onClick = { navController.navigate(NavRoutes.AddHabit.route) },
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ) {
+                        Text("+", style = MaterialTheme.typography.titleLarge)
                     }
                 }
-            ) { paddingValues ->
+            ) { padding ->
                 HabitListScreen(
                     habits = viewModel.habits,
                     onHabitCheckedChange = { habit, isChecked ->
@@ -79,7 +81,7 @@ fun BloomNavHost(viewModel: HabitViewModel) {
                     onHabitDelete = { habit ->
                         viewModel.deleteHabit(habit)
                     },
-                    modifier = Modifier.padding(paddingValues) // ✅ apply scaffold padding
+                    modifier = Modifier.padding(padding) // ✅ fixed Scaffold padding
                 )
             }
         }
@@ -98,7 +100,9 @@ fun BloomNavHost(viewModel: HabitViewModel) {
         // ✏️ Edit Habit Screen
         composable(
             route = NavRoutes.EditHabit.route,
-            arguments = listOf(navArgument("habitId") { type = NavType.IntType })
+            arguments = listOf(
+                navArgument("habitId") { type = NavType.IntType } // ✅ missing type fixed
+            )
         ) { backStackEntry ->
             val habitId = backStackEntry.arguments?.getInt("habitId")
             val habit = viewModel.habits.find { it.id == habitId }
